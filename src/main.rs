@@ -1,49 +1,73 @@
+use std::f32::consts::PI;
+mod models;
+use models::Planet;
+
 use bevy::prelude::*;
-#[derive(Component)]
-struct Person;
-
-#[derive(Component)]
-struct Name(String);
-
-#[derive(Resource)]
-struct GreetTimer(Timer);
-
-pub struct HelloPlugin;
-
-impl Plugin for HelloPlugin {
-    fn build(&self, app: &mut App) {
-        app.insert_resource(GreetTimer(Timer::from_seconds(2.0, TimerMode::Repeating)));
-        app.add_systems(Startup, add_people);
-        app.add_systems(Update, (update_people, greet_people).chain());
-    }
-}
+use tokio::runtime::Runtime;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(HelloPlugin)
+        .add_systems(Startup, setup)
+        .add_systems(Startup, spawn_planets)
         .run();
 }
 
-fn add_people(mut commands: Commands) {
-    commands.spawn((Person, Name("Elaina Proctor".to_string())));
-    commands.spawn((Person, Name("Renzo Hume".to_string())));
-    commands.spawn((Person, Name("Zayna Nieves".to_string())));
+fn setup(mut commands: Commands) {
+    commands.spawn(PointLightBundle {
+        point_light: PointLight {
+            intensity: 1500.0,
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        ..default()
+    });
+
+    commands.spawn(Camera3dBundle {
+        transform: Transform::from_xyz(0.0, 5.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..default()
+    });
 }
 
-fn greet_people(time: Res<Time>, mut timer: ResMut<GreetTimer>, query: Query<&Name, With<Person>>) {
-    if timer.0.tick(time.delta()).just_finished() {
-        for name in &query {
-            println!("hello {}!", name.0);
-        }
+fn spawn_planets(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    // Start a blocking async runtime
+    let runtime = Runtime::new().unwrap();
+
+    let planets: Vec<Planet> = runtime
+        .block_on(fetch_planets_from_api())
+        .unwrap_or_else(|_| vec![]);
+
+    for (i, planet) in planets.into_iter().enumerate() {
+        let scale = planet.diameter / 12742.0; // Earth's diameter for reference
+
+        commands.spawn(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Icosphere {
+                radius: scale * 2.0, // Scale diameter into radius
+                subdivisions: 32,
+            })),
+            material: materials.add(StandardMaterial {
+                base_color: Color::rgb(0.5, 0.5, 1.0),
+                ..default()
+            }),
+            transform: Transform::from_xyz(i as f32 * 4.0, 0.0, 0.0),
+            ..default()
+        });
     }
 }
 
-fn update_people(mut query: Query<&mut Name, With<Person>>) {
-    for mut name in &mut query {
-        if name.0 == "Elaina Proctor" {
-            name.0 = "Elaina Hume".to_string();
-            break;
-        }
-    }
+async fn fetch_planets_from_api() -> Result<Vec<Planet>, reqwest::Error> {
+    let url = "http://127.0.0.1:8000/api/planets"; // Replace with your actual API URL
+    let response = reqwest::get(url).await?.json::<Vec<Planet>>().await?;
+    Ok(response)
 }
+
+// fn rotate(mut query: Query<&mut Transform, With<Shape>>, time: Res<Time>) {
+//     for mut transform in &mut query {
+//         transform.rotate_y(time.delta_seconds() / 2.);
+//     }
+// }
