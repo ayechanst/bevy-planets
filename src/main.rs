@@ -1,16 +1,21 @@
 use std::f32::consts::PI;
+mod helpers;
 mod models;
-use models::Planet;
-
 use bevy::prelude::*;
+use helpers::{fetch_planets_from_api, get_planets};
+use models::Planet;
 use tokio::runtime::Runtime;
 
 fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .add_systems(Startup, setup)
-        .add_systems(Startup, spawn_planets)
-        .run();
+    let planets = get_planets();
+    for planet in &planets {
+        println!("{:?}", planet);
+    }
+    // App::new()
+    //     .add_plugins(DefaultPlugins)
+    //     .add_systems(Startup, setup)
+    //     .add_systems(Startup, spawn_planets)
+    //     .run();
 }
 
 fn setup(mut commands: Commands) {
@@ -43,13 +48,18 @@ fn spawn_planets(
         .unwrap_or_else(|_| vec![]);
 
     for (i, planet) in planets.into_iter().enumerate() {
-        let scale = planet.diameter / 12742.0; // Earth's diameter for reference
+        // let planet_diameter = planet
+        //     .diameter
+        //     .parse()
+        //     .expect("Failed to parse String as Float");
+        // let scale = (planet_diameter) / 12742.0;
 
         commands.spawn(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Icosphere {
-                radius: scale * 2.0, // Scale diameter into radius
-                subdivisions: 32,
-            })),
+            // mesh: meshes.add(Mesh::from(shape::Icosphere {
+            //     radius: scale * 2.0,
+            //     subdivisions: 32,
+            // })),
+            mesh: meshes.add(Sphere::default()),
             material: materials.add(StandardMaterial {
                 base_color: Color::rgb(0.5, 0.5, 1.0),
                 ..default()
@@ -59,15 +69,3 @@ fn spawn_planets(
         });
     }
 }
-
-async fn fetch_planets_from_api() -> Result<Vec<Planet>, reqwest::Error> {
-    let url = "http://127.0.0.1:8000/api/planets"; // Replace with your actual API URL
-    let response = reqwest::get(url).await?.json::<Vec<Planet>>().await?;
-    Ok(response)
-}
-
-// fn rotate(mut query: Query<&mut Transform, With<Shape>>, time: Res<Time>) {
-//     for mut transform in &mut query {
-//         transform.rotate_y(time.delta_seconds() / 2.);
-//     }
-// }
