@@ -10,9 +10,9 @@ use systems::{camera::spawn_camera, light::spawn_light, planets::spawn_planets};
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
         .add_systems(Startup, setup_planets_resource)
         .add_systems(Startup, setup)
+        .add_plugins(DefaultPlugins)
         .run();
 }
 
@@ -20,11 +20,16 @@ pub fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    planets_resource: Res<PlanetsResource>,
+    mut planets_resource: Res<PlanetsResource>,
 ) {
     spawn_camera(&mut commands);
     spawn_light(&mut commands);
-    spawn_planets(commands, meshes, materials, planets_resource);
+    spawn_planets(
+        &mut commands,
+        &mut meshes,
+        &mut materials,
+        &mut planets_resource,
+    );
 
     // commands.spawn(PbrBundle {
     //     mesh: meshes.add(Plane3d::default().mesh().size(50.0, 50.0).subdivisions(10)),

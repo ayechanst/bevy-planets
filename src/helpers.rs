@@ -16,7 +16,6 @@ pub async fn fetch_planets_from_api() -> Result<Vec<Planet>, reqwest::Error> {
 
 pub fn get_planets() -> Vec<Planet> {
     let runtime = Runtime::new().unwrap();
-
     let planets: Vec<Planet> = runtime
         .block_on(fetch_planets_from_api())
         .unwrap_or_else(|err| {
