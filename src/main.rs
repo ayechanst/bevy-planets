@@ -1,71 +1,34 @@
-use std::f32::consts::PI;
 mod helpers;
 mod models;
-use bevy::prelude::*;
-use helpers::{fetch_planets_from_api, get_planets};
-use models::Planet;
-use tokio::runtime::Runtime;
+mod resources;
+mod systems;
+use crate::resources::PlanetsResource;
+use bevy::{color::palettes::css::SILVER, prelude::*};
+use resources::planets_resource::setup_planets_resource;
+use systems::{camera::spawn_camera, light::spawn_light, planets::spawn_planets};
+// use std::f32::consts::PI;
 
 fn main() {
-    let planets = get_planets();
-    for planet in &planets {
-        println!("{:?}", planet);
-    }
-    // App::new()
-    //     .add_plugins(DefaultPlugins)
-    //     .add_systems(Startup, setup)
-    //     .add_systems(Startup, spawn_planets)
-    //     .run();
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_systems(Startup, setup_planets_resource)
+        .add_systems(Startup, setup)
+        .run();
 }
 
-fn setup(mut commands: Commands) {
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            intensity: 1500.0,
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
-    });
-
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0.0, 5.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
-}
-
-fn spawn_planets(
+pub fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    planets_resource: Res<PlanetsResource>,
 ) {
-    // Start a blocking async runtime
-    let runtime = Runtime::new().unwrap();
+    spawn_camera(&mut commands);
+    spawn_light(&mut commands);
+    spawn_planets(commands, meshes, materials, planets_resource);
 
-    let planets: Vec<Planet> = runtime
-        .block_on(fetch_planets_from_api())
-        .unwrap_or_else(|_| vec![]);
-
-    for (i, planet) in planets.into_iter().enumerate() {
-        // let planet_diameter = planet
-        //     .diameter
-        //     .parse()
-        //     .expect("Failed to parse String as Float");
-        // let scale = (planet_diameter) / 12742.0;
-
-        commands.spawn(PbrBundle {
-            // mesh: meshes.add(Mesh::from(shape::Icosphere {
-            //     radius: scale * 2.0,
-            //     subdivisions: 32,
-            // })),
-            mesh: meshes.add(Sphere::default()),
-            material: materials.add(StandardMaterial {
-                base_color: Color::rgb(0.5, 0.5, 1.0),
-                ..default()
-            }),
-            transform: Transform::from_xyz(i as f32 * 4.0, 0.0, 0.0),
-            ..default()
-        });
-    }
+    // commands.spawn(PbrBundle {
+    //     mesh: meshes.add(Plane3d::default().mesh().size(50.0, 50.0).subdivisions(10)),
+    //     material: materials.add(Color::from(SILVER)),
+    //     ..default()
+    // });
 }

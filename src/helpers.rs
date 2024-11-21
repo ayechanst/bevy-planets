@@ -1,8 +1,12 @@
 use crate::models::Planet;
+use bevy::prelude::*;
+use bevy::{
+    asset::Assets,
+    prelude::{Mesh, ResMut},
+};
 use tokio::runtime::Runtime;
 
 pub async fn fetch_planets_from_api() -> Result<Vec<Planet>, reqwest::Error> {
-    // let url = "http://127.0.0.1:8000/api/planets";
     let response = reqwest::get("http://127.0.0.1:8000/api/planets")
         .await?
         .json::<Vec<Planet>>()
@@ -19,12 +23,18 @@ pub fn get_planets() -> Vec<Planet> {
             eprintln!("Error: {}", err);
             vec![]
         });
-    // if planets.is_empty() {
-    //     println!("No planets found");
-    // } else {
-    //     for planet in &planets {
-    //         println!("{:?}", planet);
-    //     }
-    // }
     planets
+}
+
+pub fn make_mesh(planet: &Planet, meshes: &mut ResMut<Assets<Mesh>>) -> Handle<Mesh> {
+    let default_radius = 1.0;
+    let radius = match &planet.diameter {
+        Some(d) => d.parse::<f32>().unwrap_or(default_radius) / 2.0,
+        None => default_radius,
+    };
+    let mesh_handle = meshes.add(Mesh::from(Sphere {
+        radius,
+        // subdivisions: 32, // Number of subdivisions (higher number = smoother sphere)
+    }));
+    mesh_handle
 }
