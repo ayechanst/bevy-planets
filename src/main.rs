@@ -1,13 +1,17 @@
+mod camera;
 mod helpers;
 mod models;
+mod player;
 mod resources;
 mod systems;
+mod world;
+use bevy::prelude::*;
+use camera::CameraPlugin;
+use player::PlayerPlugin;
+use world::WorldPlugin;
 // mod systems;
 // use crate::resources::PlanetsResource;
-use bevy::{color::palettes::css::DARK_GREEN, prelude::*};
 use helpers::{get_planets, make_mesh};
-use models::Planet;
-use systems::{spawn_camera, spawn_floor, spawn_light, spawn_player};
 // use systems::{spawn_camera, spawn_floor, spawn_light};
 
 // use resources::{
@@ -24,11 +28,7 @@ fn main() {
     //     .add_systems(Startup, setup)
     //     .run();
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_systems(
-            Startup,
-            (spawn_floor, spawn_camera, spawn_light, spawn_player),
-        )
+        .add_plugins((DefaultPlugins, WorldPlugin, CameraPlugin))
         .run();
 
     // let planets = get_planets();
@@ -80,19 +80,4 @@ fn main() {
 //         });
 //     }
 
-//     commands.spawn(PointLightBundle {
-//         point_light: PointLight {
-//             intensity: 1500.0,
-//             range: 1000.0,
-//             shadows_enabled: true,
-//             ..default()
-//         },
-//         transform: Transform::from_xyz(5.0, 5.0, 5.0), // Position the light
-//         ..default()
-//     });
-
-//     commands.spawn(Camera3dBundle {
-//         transform: Transform::from_xyz(0.0, 7., 14.0).looking_at(Vec3::new(0., 1., 0.), Vec3::Y),
-//         ..default()
-//     });
 // }
