@@ -21,26 +21,26 @@ pub fn get_planets() -> Vec<Planet> {
     planets
 }
 
-// pub fn make_mesh(planet: &Planet, meshes: &mut ResMut<Assets<Mesh>>) -> Handle<Mesh> {
-//     let default_radius = 1.0;
-//     let radius = match &planet.diameter {
-//         Some(d) => d.parse::<f32>().unwrap_or(default_radius) / 2.0,
-//         None => default_radius,
-//     };
-//     let mesh_handle = meshes.add(Mesh::from(Sphere {
-//         radius,
-//         // subdivisions: 32, // Number of subdivisions (higher number = smoother sphere)
-//     }));
-//     mesh_handle
-// }
-
-pub fn make_mesh(planet_diameter: &f32, meshes: &mut ResMut<Assets<Mesh>>) -> Handle<Mesh> {
+pub fn make_mesh(planet: &Planet, meshes: &mut ResMut<Assets<Mesh>>) -> Handle<Mesh> {
+    let default_radius = 1.0;
+    let radius = match &planet.diameter {
+        Some(d) => d.parse::<f32>().unwrap_or(default_radius) / 2.0,
+        None => default_radius,
+    };
     let mesh_handle = meshes.add(Mesh::from(Sphere {
-        radius: planet_diameter / 2.0,
+        radius,
         // subdivisions: 32, // Number of subdivisions (higher number = smoother sphere)
     }));
     mesh_handle
 }
+
+// pub fn make_mesh(planet_diameter: &f32, meshes: &mut ResMut<Assets<Mesh>>) -> Handle<Mesh> {
+//     let mesh_handle = meshes.add(Mesh::from(Sphere {
+//         radius: planet_diameter / 2.0,
+//         // subdivisions: 32, // Number of subdivisions (higher number = smoother sphere)
+//     }));
+//     mesh_handle
+// }
 
 pub fn make_transform(index: u32) -> Transform {
     let index_float = index as f32;

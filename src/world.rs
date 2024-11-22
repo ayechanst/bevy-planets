@@ -18,70 +18,29 @@ fn spawn_pbr_bundles(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let num_entities = 10;
-
-    for i in 0..num_entities {
-        // Create a new mesh
-        let mesh = meshes.add(Mesh::from(Sphere { radius: 2.0 }));
-
-        // Create a material
+    let planets = get_planets();
+    // for i in 0..num_entities {
+    for (i, planet) in planets.iter().enumerate() {
+        // let mesh = meshes.add(Mesh::from(Sphere { radius: 2.0 }));
+        let default_radius = 10.0;
+        let radius = match &planet.diameter {
+            Some(d) => d.parse::<f32>().unwrap_or(default_radius) / 2.0,
+            None => default_radius,
+        };
+        println!("Radius: {}", radius);
+        let mesh = meshes.add(Mesh::from(Sphere {
+            radius: radius / 1000.0,
+            // subdivisions: 32, // Number of subdivisions (higher number = smoother sphere)
+        }));
         let material = materials.add(StandardMaterial {
             base_color: Color::rgb(0.3, 0.7, 0.9),
             ..default()
         });
-
-        // Compute the transform for this entity
-        let transform = Transform::from_xyz(i as f32 * 2.0, 0.0, 0.0);
-
-        // Create and spawn the PbrBundle
+        // let transform = Transform::from_xyz(i as f32 * 2.0, 0.0, 0.0);
         commands.spawn(PbrBundle {
             mesh,
             material,
-            transform,
-            ..default()
-        });
-    }
-}
-
-#[derive(Component)]
-pub struct PlanetComponent {
-    pub name: String,
-    pub diameter: f32,
-    pub position: Vec3,
-}
-
-fn spawn_planet_component(mut commands: Commands) {
-    let planets = get_planets();
-    for (i, planet) in planets.iter().enumerate() {
-        let position = Vec3::new(i as f32 * 2.0, 0.0, 0.0);
-        let default_diameter = 1.0;
-        let diameter = match &planet.diameter {
-            Some(d) => d.parse::<f32>().unwrap_or(default_diameter),
-            None => default_diameter,
-        };
-        commands.spawn((
-            PlanetComponent {
-                name: planet.name.clone(),
-                diameter,
-                position,
-            },
-            Transform::from_translation(position),
-            GlobalTransform::default(),
-        ));
-    }
-}
-
-fn render_planets(
-    mut commands: Commands,
-    mut query: Query<(Entity, &PlanetComponent, &Transform), Without<Handle<Mesh>>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    // mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    for (entity, planet, transform) in query.iter_mut() {
-        commands.entity(entity).insert(PbrBundle {
-            mesh: make_mesh(&planet.diameter, &mut meshes),
-            // material: materials.add(Color::rgb(0.5, 0.5, 1.0).into()),
-            transform: *transform,
+            transform: Transform::from_xyz(i as f32 * 2.0, 0.0, 0.0),
             ..default()
         });
     }
