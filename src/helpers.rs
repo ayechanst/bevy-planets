@@ -1,9 +1,5 @@
 use crate::models::Planet;
 use bevy::prelude::*;
-use bevy::{
-    asset::Assets,
-    prelude::{Mesh, ResMut},
-};
 use tokio::runtime::Runtime;
 
 pub async fn fetch_planets_from_api() -> Result<Vec<Planet>, reqwest::Error> {
@@ -36,4 +32,10 @@ pub fn make_mesh(planet: &Planet, meshes: &mut ResMut<Assets<Mesh>>) -> Handle<M
         // subdivisions: 32, // Number of subdivisions (higher number = smoother sphere)
     }));
     mesh_handle
+}
+
+pub fn make_transform(index: u32) -> Transform {
+    let index_float = index as f32;
+    let transform = Transform::from_xyz(index_float * 2.0, 0.0, 0.0);
+    transform
 }
