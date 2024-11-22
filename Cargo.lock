@@ -916,6 +916,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy-inspector-egui",
+ "bevy_third_person_camera",
  "reqwest",
  "serde",
  "serde_json",
@@ -1127,6 +1128,15 @@ dependencies = [
  "glyph_brush_layout",
  "serde",
  "thiserror",
+]
+
+[[package]]
+name = "bevy_third_person_camera"
+version = "0.1.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "556053f7d6e6683529528681f60551e6d63cdd9696b961a4fc4cf1719a81b47b"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]

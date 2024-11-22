@@ -19,28 +19,16 @@ fn spawn_pbr_bundles(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let planets = get_planets();
-    // for i in 0..num_entities {
     for (i, planet) in planets.iter().enumerate() {
-        // let mesh = meshes.add(Mesh::from(Sphere { radius: 2.0 }));
-        let default_radius = 10.0;
-        let radius = match &planet.diameter {
-            Some(d) => d.parse::<f32>().unwrap_or(default_radius) / 2.0,
-            None => default_radius,
-        };
-        println!("Radius: {}", radius);
-        let mesh = meshes.add(Mesh::from(Sphere {
-            radius: radius / 1000.0,
-            // subdivisions: 32, // Number of subdivisions (higher number = smoother sphere)
-        }));
+        let mesh = make_mesh(planet, &mut meshes);
         let material = materials.add(StandardMaterial {
             base_color: Color::rgb(0.3, 0.7, 0.9),
             ..default()
         });
-        // let transform = Transform::from_xyz(i as f32 * 2.0, 0.0, 0.0);
         commands.spawn(PbrBundle {
             mesh,
             material,
-            transform: Transform::from_xyz(i as f32 * 2.0, 0.0, 0.0),
+            transform: Transform::from_xyz(i as f32 * 4.0, 0.0, 0.0),
             ..default()
         });
     }
