@@ -1,5 +1,5 @@
 use crate::{
-    helpers::{get_planets, make_mesh, make_transform},
+    helpers::{get_planets, make_material, make_mesh, make_transform},
     models::Planet,
 };
 use bevy::prelude::*;
@@ -20,14 +20,15 @@ fn spawn_planets(
     let planets = get_planets();
     for (i, planet) in planets.iter().enumerate() {
         let mesh = make_mesh(planet, &mut meshes);
-        let material = materials.add(StandardMaterial {
-            base_color: Color::rgb(0.3, 0.7, 0.9),
-            ..default()
-        });
+        // let material = materials.add(StandardMaterial {
+        //     base_color: Color::rgb(0.3, 0.7, 0.9),
+        //     ..default()
+        // });
+        let material = make_material(&planet, &mut materials);
         commands.spawn(PbrBundle {
             mesh,
             material,
-            transform: Transform::from_xyz(i as f32 * 4.0, 0.0, 0.0),
+            transform: Transform::from_xyz(i as f32 * 10.0, 0.0, 0.0),
             ..default()
         });
     }

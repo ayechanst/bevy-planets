@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use tokio::runtime::Runtime;
 
 pub async fn fetch_planets_from_api() -> Result<Vec<Planet>, reqwest::Error> {
-    let response = reqwest::get("http://127.0.0.1:8000/api/planets")
+    let response = reqwest::get("http://127.0.0.1:8000/api/planets/size")
         .await?
         .json::<Vec<Planet>>()
         .await?;
@@ -31,7 +31,26 @@ pub fn make_mesh(planet: &Planet, meshes: &mut ResMut<Assets<Mesh>>) -> Handle<M
         radius: radius / 1500.0,
         // subdivisions: 32, // Number of subdivisions (higher number = smoother sphere)
     }));
+    println!("Planet: {}, Mesh: {}", &planet.name, radius);
     mesh_handle
+}
+
+pub fn make_material(
+    planet: &Planet,
+    materials: &mut ResMut<Assets<StandardMaterial>>,
+) -> Handle<StandardMaterial> {
+    let base_color = match &planet.climate {
+        Some(climate) => match climate.as_str() {
+            "unknown" => Color::rgb(0.8, 0., 0.),
+            "temperate" => Color::rgb(0.1, 0.8, 0.),
+            _ => Color::rgb(0., 0., 0.),
+        },
+        None => Color::rgb(0.5, 0.5, 0.5),
+    };
+    materials.add(StandardMaterial {
+        base_color,
+        ..default()
+    })
 }
 
 pub fn make_transform(index: u32) -> Transform {
