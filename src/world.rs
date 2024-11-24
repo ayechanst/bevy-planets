@@ -8,12 +8,11 @@ pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, (spawn_light, spawn_pbr_bundles));
-        // app.add_systems(Startup, render_planets);
+        app.add_systems(Startup, (spawn_light, spawn_planets));
     }
 }
 
-fn spawn_pbr_bundles(
+fn spawn_planets(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -34,23 +33,6 @@ fn spawn_pbr_bundles(
     }
 }
 
-// fn spawn_planets(
-//     mut commands: Commands,
-//     mut meshes: ResMut<Assets<Mesh>>,
-//     // mut materials: ResMut<Assets<StandardMaterial>>,
-// ) {
-//     let planets = get_planets();
-//     for (i, planet) in planets.iter().enumerate() {
-//         let planet_bundle = PbrBundle {
-//             mesh: make_mesh(&planet., &mut meshes),
-//             transform: Transform::from_xyz(0.0, i as f32 * 2.0, 0.0),
-//             ..default()
-//         };
-//         commands.spawn(planet_bundle);
-//         println!("Spawning planet: {}", planet.name);
-//     }
-// }
-
 fn spawn_floor(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -67,7 +49,7 @@ fn spawn_floor(
 fn spawn_light(mut commands: Commands) {
     let light = PointLightBundle {
         point_light: PointLight {
-            intensity: 2500.0,
+            intensity: 3500.0,
             ..default()
         },
         transform: Transform::from_xyz(0.0, 5.0, 0.0),

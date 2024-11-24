@@ -53,12 +53,13 @@ fn spawn_player(
 ) {
     let player = (
         PbrBundle {
-            mesh: meshes.add(Cuboid::default().mesh()),
+            // mesh: meshes.add(Cuboid::default().mesh()),
+            mesh: meshes.add(Mesh::from(Sphere { radius: 5.0 })),
             material: materials.add(Color::srgb(0.9, 0.0, 0.0)),
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         },
-        Speed(10.0),
+        Speed(30.0),
         Player,
         ThirdPersonCameraTarget,
     );
