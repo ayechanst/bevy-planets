@@ -41,11 +41,15 @@ pub fn make_material(
 ) -> Handle<StandardMaterial> {
     let base_color = match &planet.climate {
         Some(climate) => match climate.as_str() {
-            "unknown" => Color::rgb(0.8, 0., 0.),
-            "temperate" => Color::rgb(0.1, 0.8, 0.),
-            _ => Color::rgb(0., 0., 0.),
+            "unknown" => Color::srgb(0.8, 0., 0.),
+            "temperate" => Color::srgb(0.1, 0.8, 0.),
+            "arid" => Color::srgb(0.9, 0.0, 0.1),
+            "tropical" => Color::srgb(0.0, 0.5, 0.5),
+            "frozen" | "artic" | "subartic" | "frigid" => Color::srgb(1.0, 1.0, 1.0),
+            "superheated" => Color::srgb(1.0, 0., 0.),
+            _ => Color::srgb(0., 0., 0.),
         },
-        None => Color::rgb(0.5, 0.5, 0.5),
+        None => Color::srgb(0.5, 0.5, 0.5),
     };
     materials.add(StandardMaterial {
         base_color,
