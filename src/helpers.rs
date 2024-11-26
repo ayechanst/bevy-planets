@@ -1,5 +1,6 @@
-use crate::models::Planet;
+use crate::models::{BlenderResponse, Planet};
 use bevy::prelude::*;
+use reqwest::Client;
 use tokio::runtime::Runtime;
 
 pub async fn fetch_planets_from_api() -> Result<Vec<Planet>, reqwest::Error> {
@@ -19,6 +20,18 @@ pub fn get_planets() -> Vec<Planet> {
             vec![]
         });
     planets
+}
+
+pub async fn use_blender(planet: &Planet) -> Result<BlenderResponse, reqwest::Error> {
+    let client = Client::new();
+    let response = client
+        .post("http://127.0.0.1:5000/get_planets")
+        .json(&planet)
+        .send()
+        .await?
+        .json::<BlenderResponse>()
+        .await?;
+    Ok(response)
 }
 
 pub fn make_mesh(planet: &Planet, meshes: &mut ResMut<Assets<Mesh>>) -> Handle<Mesh> {

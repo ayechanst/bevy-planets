@@ -1,6 +1,6 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Planet {
     pub name: String,
     pub rotation_period: Option<String>,
@@ -16,4 +16,10 @@ pub struct Planet {
     pub population_density: Option<f32>,
     pub population_word: Option<String>,
     pub url: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct BlenderResponse {
+    pub status: String,
+    pub file_path: Option<String>,
 }
