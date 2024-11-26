@@ -7,7 +7,7 @@ use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_third_person_camera::*;
 use camera::CameraPlugin;
-use helpers::{get_planets, use_blender};
+use helpers::{get_async_planets, get_planets, use_blender};
 use player::PlayerPlugin;
 use world::WorldPlugin;
 // fn main() {
@@ -25,8 +25,8 @@ use world::WorldPlugin;
 
 #[tokio::main]
 async fn main() {
-    let planets = get_planets();
-    for planet in planets.iter() {
+    let planets = get_async_planets();
+    for planet in planets.await.iter() {
         match use_blender(planet).await {
             Ok(response) => {
                 println!("Success: {:?}", response);

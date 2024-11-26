@@ -22,6 +22,16 @@ pub fn get_planets() -> Vec<Planet> {
     planets
 }
 
+pub async fn get_async_planets() -> Vec<Planet> {
+    match fetch_planets_from_api().await {
+        Ok(planets) => planets,
+        Err(err) => {
+            eprintln!("Error: {:?}", err);
+            vec![]
+        }
+    }
+}
+
 pub async fn use_blender(planet: &Planet) -> Result<BlenderResponse, reqwest::Error> {
     let client = Client::new();
     let response = client
